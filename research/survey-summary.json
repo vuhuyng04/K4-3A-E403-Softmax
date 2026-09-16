@@ -1,0 +1,29 @@
+{
+  "total": 16,
+  "excluded_team": 2,
+  "external_provisional": 14,
+  "questions": {
+    "practice": "Bạn có nhu cầu thực hành bài tập ngay trên app Vlearn sau buổi học hay khôn ?",
+    "difficulty": "Có khi nào bạn gặp khó khăn khi làm bài tập với những câu hỏi/thuật ngữ bạn không hiểu hay không ?",
+    "ai_help": "Bạn nghĩ việc AI tutor hỗ trợ cho mình hiểu các bài tập sau khi làm có cần thiết không ?",
+    "willing": "Bạn có sẵn sàng dành từ 5 đến 10 phút để dùng phiên bản thử nghiệm vào ngày mai không ?"
+  },
+  "answers": {
+    "practice": {
+      "có": 11,
+      "không": 3
+    },
+    "difficulty": {
+      "có": 13,
+      "không": 1
+    },
+    "ai_help": {
+      "có": 14
+    },
+    "willing": {
+      "có": 9,
+      "có thể": 3,
+      "không": 2
+    }
+  }
+}

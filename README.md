@@ -4,7 +4,7 @@
 
 ## 👥 Thành viên nhóm & Phân công vai trò
 
-**Nhóm:** Softmax · **Lớp:** 3A · **Phòng:** E403 · **Cụm:** ____ · **Track:** A — VLearn Tutor
+**Nhóm:** Softmax · **Lớp:** 3A · **Phòng:** E403 · **Cụm:** C2 · **Track:** A — VLearn Tutor
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
