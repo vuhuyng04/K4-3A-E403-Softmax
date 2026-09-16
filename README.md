@@ -8,10 +8,10 @@
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-| Nguyễn Vũ Huy **(Đội trưởng)** | 2A202602662 | <Vai trò> | <Phần việc cụ thể> |
-| Đào Ngọc Bình Thiên | 2A202602814 | <Vai trò> | <Phần việc cụ thể> |
-| Đỗ Thái Sơn | 2A202603021 | <Vai trò> | <Phần việc cụ thể> |
-| Nguyễn Nguyên Phong | 2A202602691 | <Vai trò> | <Phần việc cụ thể> |
+| Nguyễn Vũ Huy **(Đội trưởng)** | 2A202602662 | Spec & Product Lead · Demo | Viết và chốt `spec.md` (§2 impact, §4 thiết kế, §5–§6 kịch bản lỗi, §9 changelog); nộp form 5 checkpoint; slide 6 trang + pitch; điều phối vòng validation (R6), tổng hợp `validation/` |
+| Đào Ngọc Bình Thiên | 2A202602814 | Evidence & Research | Mining `data/vlearn-pack/chatlog` K4 (tách `is_preset`, đếm câu xin bài tập / nhờ kiểm tra, ≥5 quote nguyên văn, phương pháp đếm); khảo sát ≥20 học viên + log; bảng impact ≥3 ứng viên; nghiên cứu sản phẩm tương tự (§1–§3 spec) |
+| Đỗ Thái Sơn | 2A202603021 | Build & Prototype | `codebase/`: giao diện nộp câu trả lời → gọi AI thật chấm bài → hiển thị verdict + trích dẫn transcript; trace log; ghi rõ phần mock (bộ bài tập soạn sẵn) / phần thật; video 30s (CP3) + video demo dự phòng (CP5) |
+| Nguyễn Nguyên Phong | 2A202602691 | Prompt & Eval | Prompt chấm bài có căn cứ transcript; golden set ≥20 câu trả lời có nhãn trong `eval/` (≥2 case/lớp chỗ khó, ≥10 từ data thật); định nghĩa "đạt" + quality bar (§7); chạy đo các lượt, bảng %, phân tích case fail |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 

@@ -6,10 +6,10 @@
 
 | STT | Họ và Tên | MSSV | Vai trò |
 |---|---|---|---|
-| 1 | Nguyễn Vũ Huy **(Đội trưởng)** | 2A202602662 | <Vai trò> |
-| 2 | Đào Ngọc Bình Thiên | 2A202602814 | <Vai trò> |
-| 3 | Đỗ Thái Sơn | 2A202603021 | <Vai trò> |
-| 4 | Nguyễn Nguyên Phong | 2A202602691 | <Vai trò> |
+| 1 | Nguyễn Vũ Huy **(Đội trưởng)** | 2A202602662 | Spec & Product Lead · Demo |
+| 2 | Đào Ngọc Bình Thiên | 2A202602814 | Evidence & Research |
+| 3 | Đỗ Thái Sơn | 2A202603021 | Build & Prototype |
+| 4 | Nguyễn Nguyên Phong | 2A202602691 | Prompt & Eval |
 
 ## Liên hệ đội trưởng
 

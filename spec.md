@@ -5,7 +5,7 @@
 ```markdown
 # AI SPEC — [Tên lát cắt] · Nhóm Softmax · Zone [X]
 Hướng: [x] A — VLearn Tutor  [ ] B — Trợ lý Discord  [ ] C — Lesson Studio  [ ] D — Học tập thích ứng & tương tác  [ ] E — Làn mở
-Loại: [ ] Tối ưu tính năng có sẵn  [ ] Tính năng mới
+Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới (A2)
 
 ## §1. User & Job
 - Job executor + workflow (đính kèm worksheet JTBD / ảnh sơ đồ):
