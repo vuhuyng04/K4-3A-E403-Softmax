@@ -1,15 +1,35 @@
 # codebase/
 
-Prototype của nhóm Softmax. Ghi rõ phần nào **mock**, phần nào gọi AI thật. Không commit API key — dùng `.env` (đã ignore).
+Prototype của nhóm Softmax — AI Tutor giải thích câu trắc nghiệm sau khi học viên nộp bài. Không commit API key — dùng `codebase/.env` (đã ignore).
 
-## `prototype/index.html` — mock luồng (CP2)
+## 1. Bản chạy thật — `app/` + `server/` (CP3)
 
-Mở trực tiếp bằng trình duyệt. Luồng: chọn đáp án trắc nghiệm → nộp → mở khóa AI Tutor → hỏi 3 loại câu (đáp án đúng · đáp án sai ở đâu · mở rộng/so sánh) → bấm trích dẫn `Buổi 5 · Đn` để xem đoạn transcript.
+Dữ liệu thật từ `data/vlearn-pack/` + gọi Gemini thật. **Chỉ chạy local** — không publish vì chứa transcript và đề quiz của khoá.
 
-| Phần | Trạng thái |
-|---|---|
-| Transcript Buổi 5, 3 câu hỏi, đáp án chuẩn | **Mock** — nhóm tự soạn, không phải data thật |
-| Câu trả lời của AI Tutor | **Mock** — soạn sẵn theo từng loại câu hỏi |
-| Nhận diện loại câu hỏi khi tự gõ | **Mock** — bắt từ khóa đơn giản |
-| Nhánh từ chối (prompt injection, xin đáp án câu khác) và nhánh "chưa đủ căn cứ" | **Mock** — minh họa hành vi mong muốn |
-| Gọi LLM thật | Chưa có — làm ở CP3 |
+```bash
+# 1. Dựng dữ liệu local (cần thư mục data/ ở gốc repo)
+python codebase/scripts/build_data.py
+
+# 2. Điền GEMINI_API_KEY vào codebase/.env (mẫu: codebase/.env.example)
+
+# 3. Chạy server (chỉ dùng thư viện chuẩn Python 3.10+, không cần pip install)
+python codebase/server/app.py
+# mở http://localhost:8000
+```
+
+| Thành phần | File | Thật / Mock |
+|---|---|---|
+| Transcript bài giảng (700 đoạn `[Txx-NNN]`) | `scripts/build_data.py` → `local-data/segments.json` | **Thật** — 6 transcript sạch của BTC |
+| Câu trắc nghiệm (9 câu) | `question_bank.json` (chỉ mã) → `local-data/questions.json` | **Thật** — đề + lựa chọn trích từ chatlog K4 (học viên dán vào tutor), mã nguồn `turn_id` |
+| Đáp án chuẩn | `question_bank.json` → `key`, `key_source` | **Nhóm dựng lại** từ nhãn nền tảng / câu trả lời tutor VLearn — `reviewed: false` = chưa duyệt |
+| Ghép buổi học ↔ transcript | `question_bank.json` → `lecture_transcripts` | **Nhóm tự đánh giá** (D01 → T04, T06 · D03 → T05, T01, T02, T03) |
+| Truy xuất đoạn liên quan | `server/retrieval.py` (BM25, top-k) | Thật |
+| Giải thích + phân loại intent | `server/prompts.py`, `server/llm.py` | **Gọi Gemini thật**, JSON có schema |
+| Kiểm tra trích dẫn | `server/app.py` | Thật — trích dẫn không nằm trong đoạn đã truy xuất bị gỡ và ghi `invalid_citations` |
+| Trace log | `logs/trace.jsonl` (ignored) | Thật — mỗi lượt: input, output, trích dẫn, anchor_hit, latency, tokens |
+
+Case khó có sẵn: `q07` (có thể không có trong transcript), `q09` (đề lỗi: tập nucleus là {A,B,C} nhưng mỗi lựa chọn chỉ 1 token).
+
+## 2. Bản mock — `prototype/index.html` (CP2)
+
+Mở trực tiếp bằng trình duyệt. Toàn bộ transcript, câu hỏi, câu trả lời AI là dữ liệu nhóm tự soạn; có chế độ "Demo từng bước".

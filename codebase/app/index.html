@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VLearn AI Tutor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#F3F5F4; --surface:#FFFFFF; --ink:#18222B; --muted:#5B6770; --line:#DCE2E0;
+  --accent:#1F5F74; --accent-ink:#FFFFFF; --accent-soft:#E1EEF1; --ring:rgba(31,95,116,.35);
+  --ok:#2E7D4F; --ok-soft:#E3F2E8; --bad:#B3403A; --bad-soft:#F8E6E4;
+  --cite:#8A5A12; --cite-soft:#F6ECD9; --user:#1F5F74; --user-ink:#FFFFFF;
+  --sans:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10161B; --surface:#172028; --ink:#E4EAEC; --muted:#93A1A8; --line:#29343C;
+    --accent:#6FB6C9; --accent-ink:#0D1A20; --accent-soft:#1B3440; --ring:rgba(111,182,201,.4);
+    --ok:#6CC08F; --ok-soft:#173024; --bad:#E58A82; --bad-soft:#3A1F1D;
+    --cite:#E0B066; --cite-soft:#3A2E17; --user:#24505F; --user-ink:#E8F3F6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10161B; --surface:#172028; --ink:#E4EAEC; --muted:#93A1A8; --line:#29343C;
+  --accent:#6FB6C9; --accent-ink:#0D1A20; --accent-soft:#1B3440; --ring:rgba(111,182,201,.4);
+  --ok:#6CC08F; --ok-soft:#173024; --bad:#E58A82; --bad-soft:#3A1F1D;
+  --cite:#E0B066; --cite-soft:#3A2E17; --user:#24505F; --user-ink:#E8F3F6;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.brand{font-weight:700;letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+.crumb{color:var(--muted);font-size:13px}
+.env{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px}
+.badge{font-weight:600;padding:3px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.badge.warn{background:var(--cite-soft);color:var(--cite)}
+.badge.err{background:var(--bad-soft);color:var(--bad)}
+.badge.mono{font-family:var(--mono);font-weight:500}
+
+.wrap{max-width:1240px;margin:0 auto;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,480px);gap:20px;align-items:start}
+@media (max-width:960px){.wrap{grid-template-columns:minmax(0,1fr);padding:16px}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.q-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.q-head h1{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:0}
+.q-nav{display:flex;gap:6px;flex-wrap:wrap}
+.q-dot{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-variant-numeric:tabular-nums}
+.q-dot[aria-current="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.q-dot.done-ok{box-shadow:inset 0 -3px 0 var(--ok)}
+.q-dot.done-bad{box-shadow:inset 0 -3px 0 var(--bad)}
+
+.q-body{padding:18px 20px 20px;display:grid;gap:14px}
+.q-body.enter > *{animation:rise .35s ease-out both}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--muted);align-items:center}
+.meta .badge{font-size:11px}
+.stem{font-size:16.5px;font-weight:600;line-height:1.5;margin:0;white-space:pre-wrap}
+.opts{display:grid;gap:10px;margin:0;padding:0;border:0}
+.opts legend{padding:0;margin-bottom:6px}
+.opt{position:relative;display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:var(--surface);transition:border-color .2s,background .25s}
+.opt:hover{border-color:var(--accent)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt .letter{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-weight:600;font-size:13px}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt:has(input:checked) .letter{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);animation:pop .25s ease-out}
+.opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.opt.locked{cursor:default}
+.opt.locked:hover{border-color:var(--line)}
+.opt.is-correct{border-color:var(--ok);background:var(--ok-soft)}
+.opt.is-correct .letter{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.opt.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.is-wrong .letter{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.opt.dim{opacity:.6}
+.opt .tag{margin-left:auto;flex:none;font-size:12px;font-weight:600;padding-top:3px}
+.opt.is-correct .tag{color:var(--ok)} .opt.is-wrong .tag{color:var(--bad)}
+.opt.reveal-ok{animation:glowOk .9s ease-out}
+.opt.reveal-bad{animation:shake .45s ease-out}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:8px;cursor:pointer;font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{padding:4px 10px;font-size:12.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.hint{color:var(--muted);font-size:13px}
+.result{padding:12px 14px;border-radius:8px;font-weight:500;animation:rise .4s ease-out both .2s}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.bad{background:var(--bad-soft);color:var(--bad)}
+.result small{display:block;font-weight:400;color:var(--muted);margin-top:4px}
+
+.sources{border-top:1px solid var(--line);padding:14px 20px 20px}
+.sources h2{font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.segs{display:grid;gap:8px;max-height:460px;overflow-y:auto}
+.seg{padding:10px 12px;border-radius:8px;border:1px solid var(--line);transition:background .4s,border-color .4s}
+.seg header{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;margin-bottom:4px}
+.seg .sid{font-family:var(--mono);font-size:12px;color:var(--cite)}
+.seg .sec{font-size:12px;color:var(--muted)}
+.seg p{margin:0;font-size:14px}
+.seg.flash{background:var(--cite-soft);border-color:var(--cite)}
+.empty{color:var(--muted);font-size:13.5px}
+
+/* Chat */
+.chat{display:flex;flex-direction:column;height:min(800px,calc(100vh - 96px));position:sticky;top:16px;overflow:hidden}
+@media (max-width:960px){.chat{position:static;height:680px}}
+.chat.unlock{animation:unlock 1.1s ease-out}
+.chat-head{padding:14px 16px;border-bottom:1px solid var(--line);display:grid;gap:2px}
+.chat-head strong{font-size:16px;display:flex;align-items:center;gap:8px}
+.status{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.status.on{background:var(--ok)}
+.chat-head .sub{color:var(--muted);font-size:13px}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:94%;padding:10px 13px;border-radius:10px;font-size:14px;animation:rise .3s ease-out both}
+.msg p{margin:0 0 6px} .msg p:last-child{margin:0}
+.msg ul{margin:4px 0 8px;padding-left:18px;display:grid;gap:5px}
+.msg.ai{background:var(--bg);border:1px solid var(--line);align-self:flex-start;border-top-left-radius:3px}
+.msg.user{background:var(--user);color:var(--user-ink);align-self:flex-end;border-top-right-radius:3px}
+.msg.error{background:var(--bad-soft);color:var(--bad);border:1px solid var(--bad);align-self:stretch}
+.kind{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.cite{font-family:var(--mono);font-size:11.5px;color:var(--cite);background:var(--cite-soft);border:0;border-radius:4px;padding:1px 6px;cursor:pointer;white-space:nowrap}
+.cite:hover{text-decoration:underline}
+.note{margin-top:8px;font-size:13px;padding:8px 10px;border-radius:6px}
+.note b{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.note.outside{background:var(--cite-soft);color:var(--cite)}
+.typing{display:flex;align-items:center;gap:4px;padding:12px 14px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:b 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.typing span{margin-left:6px;font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px 0;border-top:1px solid var(--line)}
+.chip{border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer;text-align:left;animation:rise .3s ease-out both}
+.chip:hover{background:var(--accent-soft)}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+.composer{display:flex;gap:8px;padding:10px 16px 14px}
+.composer input{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:9px 12px;font:inherit;font-size:14px}
+.locked-note{flex:1;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted)}
+.locked-note strong{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+.lock-ico{width:40px;height:40px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes glowOk{0%{box-shadow:0 0 0 0 var(--ok)}100%{box-shadow:0 0 0 10px transparent}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+@keyframes unlock{0%{box-shadow:0 0 0 0 var(--ring)}40%{box-shadow:0 0 0 8px var(--ring)}100%{box-shadow:0 0 0 0 transparent}}
+@keyframes b{0%,60%,100%{opacity:.25}30%{opacity:1}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">VLearn <span>· AI Tutor</span></div>
+  <div class="crumb" id="crumb">Đang tải…</div>
+  <div class="env" id="env"></div>
+</header>
+
+<main class="wrap">
+  <section class="panel" aria-label="Bài tập">
+    <div class="q-head">
+      <h1 id="qLabel">Câu – / –</h1>
+      <nav class="q-nav" id="qNav" aria-label="Chọn câu hỏi"></nav>
+    </div>
+    <div class="q-body" id="qBody">
+      <div class="meta" id="meta"></div>
+      <p class="stem" id="stem"></p>
+      <fieldset class="opts" id="opts"></fieldset>
+      <div class="actions">
+        <button class="btn primary" id="submitBtn" disabled>Nộp đáp án</button>
+        <button class="btn" id="retryBtn" hidden>Làm lại câu này</button>
+        <button class="btn" id="nextBtn" hidden>Câu tiếp theo →</button>
+        <span class="hint" id="submitHint">Chọn một đáp án để nộp. AI Tutor mở sau khi nộp.</span>
+      </div>
+      <div id="result" hidden></div>
+    </div>
+    <div class="sources">
+      <h2>Đoạn bài giảng được trích</h2>
+      <div class="segs" id="segs"><p class="empty">Trích dẫn trong câu trả lời của AI Tutor sẽ hiện ở đây.</p></div>
+    </div>
+  </section>
+
+  <aside class="panel chat" id="chatPanel" aria-label="AI Tutor">
+    <div class="chat-head">
+      <strong><span class="status" id="status"></span>AI Tutor</strong>
+      <span class="sub" id="chatSub">Giải thích dựa trên transcript bài giảng</span>
+    </div>
+    <div class="locked-note" id="lockedNote">
+      <div>
+        <div class="lock-ico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+        <strong>Chọn đáp án và nộp trước</strong>AI Tutor mở sau khi bạn nộp, để bạn tự nghĩ trước rồi mới xem giải thích.
+      </div>
+    </div>
+    <div class="msgs" id="msgs" hidden aria-live="polite"></div>
+    <div class="chips" id="chips" hidden></div>
+    <form class="composer" id="composer">
+      <input id="chatInput" type="text" autocomplete="off" placeholder="Nộp đáp án để bắt đầu hỏi…" disabled maxlength="1000">
+      <button class="btn primary" id="sendBtn" disabled>Gửi</button>
+    </form>
+  </aside>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const INTENT = {correct_answer:"Đáp án đúng", wrong_answer:"Đáp án sai ở đâu", extend:"Mở rộng · so sánh", off_topic:"Ngoài phạm vi"};
+const HARD = {defective_key:"Case khó: đề/đáp án nghi lỗi", not_in_transcript:"Case khó: có thể không có trong transcript"};
+
+const S = {qs:[], qi:0, picked:{}, sub:{}, chats:{}, segs:{}, busy:false};
+
+async function api(path, body){
+  const r = await fetch(path, body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {});
+  const data = await r.json().catch(() => ({error:`Server trả lỗi ${r.status}`}));
+  if(!r.ok) throw new Error(data.error || `Lỗi ${r.status}`);
+  return data;
+}
+
+/* Markdown tối giản: **đậm**, gạch đầu dòng "- ", đoạn văn, và trích dẫn [Txx-NNN] */
+function md(text){
+  const inline = s => esc(s)
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/\[(T\d{2}-\d{3})\]/g, '<button type="button" class="cite" data-seg="$1">$1</button>');
+  const out = []; let list = null;
+  for(const raw of String(text).split("\n")){
+    const line = raw.trim();
+    const m = line.match(/^[-*•]\s+(.*)/);
+    if(m){ if(!list){ list = []; out.push(list); } list.push(inline(m[1])); continue; }
+    list = null;
+    if(line) out.push(`<p>${inline(line)}</p>`);
+  }
+  return out.map(x => Array.isArray(x) ? `<ul>${x.map(li => `<li>${li}</li>`).join("")}</ul>` : x).join("");
+}
+
+/* ===== Câu hỏi ===== */
+function renderQuestion(fx = {}){
+  const q = S.qs[S.qi]; if(!q) return;
+  const done = S.sub[q.id], pick = S.picked[q.id];
+  $("qLabel").textContent = `Câu ${S.qi+1} / ${S.qs.length}`;
+  $("crumb").textContent = `Khoá K4 › ${q.lecture} · ${q.lecture_title} › ${q.section}`;
+  $("qNav").innerHTML = S.qs.map((x,i) => {
+    const s = S.sub[x.id];
+    return `<button class="q-dot ${s ? (s.correct ? "done-ok" : "done-bad") : ""}" data-q="${i}" aria-current="${i===S.qi}">${i+1}</button>`;
+  }).join("");
+  $("meta").innerHTML = `<span class="badge mono">nguồn ${esc(q.turn_id)}</span>`
+    + (q.reviewed ? `<span class="badge">Đáp án đã duyệt</span>` : `<span class="badge warn">Đáp án chưa duyệt</span>`)
+    + (q.hard_case ? `<span class="badge err">${esc(HARD[q.hard_case] || q.hard_case)}</span>` : "");
+  $("stem").textContent = q.stem;
+  $("opts").innerHTML = `<legend class="hint">${done ? "Kết quả" : "Chọn một đáp án"}</legend>` + Object.entries(q.options).map(([k,text]) => {
+    let cls = "opt", tag = "";
+    if(done){
+      cls += " locked";
+      if(k === done.key){ cls += " is-correct"; tag = "Đáp án chuẩn"; if(fx.reveal) cls += " reveal-ok"; }
+      else if(k === pick){ cls += " is-wrong"; tag = "Bạn chọn"; if(fx.reveal) cls += " reveal-bad"; }
+      else cls += " dim";
+    }
+    return `<label class="${cls}"><input type="radio" name="opt" id="opt-${q.id}-${k}" value="${k}" ${pick===k?"checked":""} ${done?"disabled":""}><span class="letter">${k}</span><span>${esc(text)}</span>${tag?`<span class="tag">${tag}</span>`:""}</label>`;
+  }).join("");
+  const body = $("qBody"); body.classList.remove("enter"); if(fx.enter){ void body.offsetWidth; body.classList.add("enter"); }
+  $("submitBtn").hidden = !!done; $("submitBtn").disabled = !pick || S.busy;
+  $("submitHint").hidden = !!done;
+  $("retryBtn").hidden = !done; $("nextBtn").hidden = !done || S.qi === S.qs.length-1;
+  const r = $("result");
+  if(done){
+    r.hidden = false; r.className = "result " + (done.correct ? "ok" : "bad");
+    r.innerHTML = (done.correct ? `<b>Chính xác.</b> Bạn chọn ${pick}.` : `<b>Chưa đúng.</b> Bạn chọn ${pick}, đáp án chuẩn là ${done.key}.`)
+      + ` Hỏi AI Tutor để hiểu rõ hơn.<small>Căn cứ đáp án chuẩn: ${esc(done.key_source)}</small>`;
+  } else r.hidden = true;
+  renderSegs();
+}
+
+$("opts").addEventListener("change", e => {
+  const q = S.qs[S.qi]; S.picked[q.id] = e.target.value;
+  $("submitBtn").disabled = false;
+  $("submitHint").textContent = `Đã chọn ${e.target.value}. Bấm "Nộp đáp án" để xem kết quả.`;
+});
+$("submitBtn").addEventListener("click", async () => {
+  const q = S.qs[S.qi], chosen = S.picked[q.id]; if(!chosen) return;
+  $("submitBtn").disabled = true;
+  try{
+    S.sub[q.id] = await api("/api/submit", {qid:q.id, chosen});
+    S.chats[q.id] = [{role:"ai", html:`<p>Mình đã có transcript bài ${esc(q.lecture)}, câu hỏi này và đáp án bạn chọn (<b>${chosen}</b>, ${S.sub[q.id].correct ? "đúng" : "chưa đúng"}).</p><p>Chọn một gợi ý bên dưới hoặc tự gõ câu hỏi.</p>`, text:""}];
+    renderQuestion({reveal:true}); renderChat(true);
+  }catch(err){ $("submitHint").hidden = false; $("submitHint").textContent = err.message; $("submitBtn").disabled = false; }
+});
+function go(i){ if(S.busy) return; S.qi = i; $("submitHint").textContent = "Chọn một đáp án để nộp. AI Tutor mở sau khi nộp."; renderQuestion({enter:true}); renderChat(); }
+$("qNav").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if(b) go(+b.dataset.q); });
+$("nextBtn").addEventListener("click", () => go(S.qi+1));
+$("retryBtn").addEventListener("click", () => { const q = S.qs[S.qi]; delete S.sub[q.id]; delete S.picked[q.id]; delete S.chats[q.id]; delete S.segs[q.id]; go(S.qi); });
+
+/* ===== Đoạn bài giảng ===== */
+function renderSegs(){
+  const q = S.qs[S.qi], segs = Object.values(S.segs[q.id] || {});
+  $("segs").innerHTML = segs.length
+    ? segs.map(s => `<article class="seg" id="seg-${s.id}"><header><span class="sid">${s.id}</span><span class="sec">${esc(s.lecture_title)} › ${esc(s.section)}</span></header><p>${esc(s.text)}</p></article>`).join("")
+    : `<p class="empty">Trích dẫn trong câu trả lời của AI Tutor sẽ hiện ở đây.</p>`;
+}
+document.addEventListener("click", e => {
+  const c = e.target.closest(".cite"); if(!c) return;
+  const el = $("seg-" + c.dataset.seg); if(!el) return;
+  el.scrollIntoView({behavior:"smooth", block:"nearest"});
+  el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 2000);
+});
+
+/* ===== Chat ===== */
+let chips = [];
+function renderChat(unlock){
+  const q = S.qs[S.qi], done = S.sub[q.id];
+  $("lockedNote").hidden = !!done; $("msgs").hidden = !done; $("chips").hidden = !done;
+  $("status").classList.toggle("on", !!done);
+  $("chatInput").disabled = !done || S.busy; $("sendBtn").disabled = !done || S.busy;
+  $("chatInput").placeholder = done ? "Hỏi về câu này, ví dụ: vì sao B sai?" : "Nộp đáp án để bắt đầu hỏi…";
+  $("chatSub").textContent = done ? `Đang hỗ trợ: Câu ${S.qi+1} · transcript bài ${q.lecture}` : "Giải thích dựa trên transcript bài giảng";
+  const panel = $("chatPanel"); panel.classList.remove("unlock"); if(unlock){ void panel.offsetWidth; panel.classList.add("unlock"); }
+  if(!done) return;
+  $("msgs").innerHTML = S.chats[q.id].map(m => `<div class="msg ${m.role}">${m.html}</div>`).join("");
+  $("msgs").scrollTop = $("msgs").scrollHeight;
+  const pick = S.picked[q.id];
+  chips = [
+    {label:`Vì sao đáp án đúng là ${done.key}?`, intent:"correct_answer"},
+    {label: done.correct ? "Các đáp án khác sai ở đâu?" : `Mình chọn ${pick} sai ở đâu?`, intent:"wrong_answer"},
+    {label:"Mở rộng: so sánh các đáp án sai", intent:"extend"},
+  ];
+  $("chips").innerHTML = chips.map((c,i) => `<button type="button" class="chip" data-chip="${i}" ${S.busy?"disabled":""} style="animation-delay:${i*80}ms">${esc(c.label)}</button>`).join("");
+}
+$("chips").addEventListener("click", e => { const b = e.target.closest("[data-chip]"); if(b){ const c = chips[+b.dataset.chip]; ask(c.label, c.intent); } });
+$("composer").addEventListener("submit", e => { e.preventDefault(); const v = $("chatInput").value.trim(); if(v){ $("chatInput").value = ""; ask(v); } });
+
+function aiHtml(r){
+  const outside = r.outside_note ? `<div class="note outside"><b>Ngoài nội dung bài giảng · nên hỏi giảng viên/TA để xác nhận</b>${esc(r.outside_note)}</div>` : "";
+  return `<span class="kind">${esc(INTENT[r.intent] || r.intent)}</span>${md(r.answer)}${outside}`;
+}
+
+async function ask(text, intent){
+  const q = S.qs[S.qi];
+  if(S.busy || !S.sub[q.id]) return;
+  const chat = S.chats[q.id];
+  const history = chat.filter(m => m.text).map(m => ({role:m.role === "user" ? "hoc_vien" : "tutor", text:m.text}));
+  chat.push({role:"user", html:`<p>${esc(text)}</p>`, text});
+  S.busy = true; renderChat(); renderQuestion();
+  const typing = document.createElement("div");
+  typing.className = "msg ai typing"; typing.innerHTML = `<i></i><i></i><i></i><span>Đang tìm trong transcript và hỏi Gemini…</span>`;
+  $("msgs").appendChild(typing); $("msgs").scrollTop = $("msgs").scrollHeight;
+  try{
+    const r = await api("/api/tutor", {qid:q.id, chosen:S.picked[q.id], message:text, intent_hint:intent || null, history});
+    chat.push({role:"ai", html:aiHtml(r), text:r.answer});
+    S.segs[q.id] = S.segs[q.id] || {};
+    r.citations.forEach(c => S.segs[q.id][c.id] = c);
+  }catch(err){
+    chat.push({role:"error", html:`<p><b>Không lấy được câu trả lời.</b> ${esc(err.message)}</p>`, text:""});
+  }
+  S.busy = false;
+  if(S.qs[S.qi].id === q.id){ renderChat(); renderQuestion(); }
+}
+
+/* ===== Khởi động ===== */
+(async () => {
+  try{
+    const [health, qs] = await Promise.all([api("/api/health"), api("/api/questions")]);
+    $("env").innerHTML = `<span class="badge">Dữ liệu thật · chạy local</span><span class="badge mono">${esc(health.model)}</span>`
+      + (health.has_key ? "" : `<span class="badge err">Thiếu GEMINI_API_KEY</span>`)
+      + `<span class="badge mono">${health.segments} đoạn · top ${health.top_k}</span>`;
+    S.qs = qs; renderQuestion({enter:true}); renderChat();
+  }catch(err){
+    $("crumb").textContent = "Không kết nối được server: " + err.message + ". Chạy python codebase/server/app.py rồi mở http://localhost:8000";
+  }
+})();
+</script>
+</body>
+</html>

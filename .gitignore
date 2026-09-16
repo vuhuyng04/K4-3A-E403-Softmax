@@ -1,10 +1,14 @@
 # Data pack của khoá học — TUYỆT ĐỐI không commit (quy định bảo mật dữ liệu)
 data/
 *-pack/
+# Dữ liệu dựng từ data pack + trace log (chứa nội dung transcript/câu hỏi thật)
+codebase/local-data/
+codebase/logs/
 
 # API keys & secrets
 .env
 .env.*
+!.env.example
 *.key
 *.pem
 secrets/

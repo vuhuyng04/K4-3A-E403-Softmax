@@ -1,0 +1,27 @@
+{
+  "_note": "Chỉ lưu mã tham chiếu và đáp án chuẩn. Đề + lựa chọn được build_data.py trích từ chatlog vào local-data/ (không commit). key_source ghi căn cứ đáp án; anchors là đoạn transcript nhóm cho là căn cứ (dùng để eval); reviewed=false nghĩa là CHƯA có người trong nhóm duyệt lại.",
+  "lecture_transcripts": {
+    "D01": ["T04", "T06"],
+    "D03": ["T05", "T01", "T02", "T03"]
+  },
+  "questions": [
+    {"id": "q01", "turn_id": "T10471", "lecture": "D01", "key": "A", "anchors": ["T04-072"], "reviewed": false,
+     "key_source": "Tutor VLearn trả lời A; khớp T04-072 (temperature 0 cho kết quả gần như giống nhau)"},
+    {"id": "q02", "turn_id": "T12578", "lecture": "D01", "key": "D", "anchors": ["T04-072"], "reviewed": false,
+     "key_source": "Nền tảng đánh dấu 'Đáp án đúng' ở D (học viên dán kèm). Transcript chỉ nói top-p để khoanh vùng, không nói cơ chế cộng dồn"},
+    {"id": "q03", "turn_id": "T11582", "lecture": "D01", "key": "D", "anchors": ["T04-051", "T06-149"], "reviewed": false,
+     "key_source": "Tutor VLearn trả lời D. Transcript nói về context window, chưa thấy nói trực tiếp 'lost in the middle'"},
+    {"id": "q04", "turn_id": "T11237", "lecture": "D01", "key": "C", "anchors": ["T06-128"], "reviewed": false,
+     "key_source": "Nhóm suy ra (embedding lookup), khớp T06-128; tutor VLearn chỉ gợi ý"},
+    {"id": "q05", "turn_id": "T11574", "lecture": "D01", "key": "C", "anchors": ["T06-051"], "reviewed": false,
+     "key_source": "Tutor VLearn trả lời C; T06-051 định nghĩa discriminative AI"},
+    {"id": "q06", "turn_id": "T10477", "lecture": "D01", "key": "C", "anchors": ["T04-031"], "reviewed": false,
+     "key_source": "Nền tảng đánh dấu 'Đáp án đúng' ở C (học viên dán kèm). Anchor chưa chắc — cần duyệt"},
+    {"id": "q07", "turn_id": "T12013", "lecture": "D03", "key": "D", "anchors": [], "reviewed": false, "hard_case": "not_in_transcript",
+     "key_source": "Nền tảng đánh dấu 'Đáp án đúng' ở D. Chưa tìm thấy đoạn transcript nói về A/B test và biến nhiễu — case kiểm tra AI có nói 'ngoài bài' không"},
+    {"id": "q08", "turn_id": "T11623", "lecture": "D03", "key": "D", "anchors": ["T02-034", "T03-107"], "reviewed": false,
+     "key_source": "Tutor VLearn trả lời D; T02-034 automation/augmentation theo hậu quả, T03-107 scope vận hành"},
+    {"id": "q09", "turn_id": "T11581", "lecture": "D01", "key": "D", "anchors": ["T04-072"], "reviewed": false, "hard_case": "defective_key",
+     "key_source": "CÂU LỖI: tập nucleus top-p=0,75 là {A,B,C} (0,42+0,28=0,70<0,75; +0,18=0,88) nhưng mỗi lựa chọn chỉ có 1 token. Đặt tạm D để test AI có nêu nghi vấn về đề/đáp án không"}
+  ]
+}
