@@ -8,10 +8,10 @@
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-| <Họ tên> **(Đội trưởng)** | <MSSV> | <Vai trò> | <Phần việc cụ thể> |
-| <Họ tên> | <MSSV> | <Vai trò> | <Phần việc cụ thể> |
-| <Họ tên> | <MSSV> | <Vai trò> | <Phần việc cụ thể> |
-| <Họ tên> | <MSSV> | <Vai trò> | <Phần việc cụ thể> |
+| Nguyễn Vũ Huy **(Đội trưởng)** | 2A202602662 | <Vai trò> | <Phần việc cụ thể> |
+| Đào Ngọc Bình Thiên | 2A202602814 | <Vai trò> | <Phần việc cụ thể> |
+| Đỗ Thái Sơn | 2A202603021 | <Vai trò> | <Phần việc cụ thể> |
+| Nguyễn Nguyên Phong | 2A202602691 | <Vai trò> | <Phần việc cụ thể> |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 
