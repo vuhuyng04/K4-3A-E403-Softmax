@@ -1,6 +1,6 @@
 # Nhóm Softmax — K4-3A-E403
 
-**Lớp:** 3A · **Phòng:** E403 · **Track:** *(chưa chốt)*
+**Lớp:** 3A · **Phòng:** E403 · **Track:** A — VLearn Tutor
 
 ## Thành viên
 
