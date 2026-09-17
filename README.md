@@ -15,6 +15,8 @@
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 
+> **Sơ đồ luồng toàn hệ thống** (luồng người dùng · luồng dữ liệu · trình tự gọi): [`codebase/README.md` §2.0](codebase/README.md#20-sơ-đồ-luồng-toàn-hệ-thống) · Spec: [`spec.md`](spec.md) · Kết quả đo: [`eval/runs/`](eval/runs/)
+
 - Thời lượng: **47,5 giờ** từ phát đề đến thuyết trình (ca 3A) — LAB 5 (phát đề + build) · LEC 6 (tiếp tục build theo ca) · LAB 6 (vòng thi)
 - Nhóm: **3-4 người** · thi theo phòng (E403 / E402), chia cụm rồi chung kết phòng — xem *Thể thức thi*
 - **Chia cụm theo bàn**, không cần chung đề tài. Chủ đề tự chọn trong khuôn khổ đề bài

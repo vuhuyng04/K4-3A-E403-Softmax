@@ -124,6 +124,117 @@ Giữ terminal này chạy. Tắt server: **Ctrl+C**. Sửa `.env` thì phải t
 
 ## 2. Cách hoạt động
 
+### 2.0 Sơ đồ luồng toàn hệ thống
+
+**Luồng người dùng — một lượt hỏi tutor sau khi nộp đáp án** *(GitHub render Mermaid trực tiếp)*
+
+```mermaid
+flowchart TD
+    A([Học viên mở trang]) --> B[Chọn câu quiz thật<br/>9 câu từ chatlog K4]
+    B --> C[Chọn đáp án → Nộp]
+    C --> D{"/api/submit<br/>so với key"}
+    D --> E["Hiện đúng/sai + nhãn<br/>'đã duyệt' / 'chưa duyệt'"]
+    E --> F[Khung AI Tutor mở khoá<br/>3 nút gợi ý hoặc tự gõ]
+    F --> G["/api/tutor<br/>{qid, chosen, message, history}"]
+
+    G --> H["Guard đầu vào<br/>thiếu qid/đáp án/tin nhắn?"]
+    H -- có lỗi --> H1[HTTP 400 rõ ràng<br/>không gọi model]
+    H -- hợp lệ --> I["BM25 retrieval<br/>đề + lựa chọn + tin nhắn<br/>→ top-8 đoạn transcript<br/>của đúng buổi học"]
+
+    I --> J{Có đoạn nào?}
+    J -- "0 đoạn" --> K["Rule no_evidence (HAX G10)<br/>KHÔNG gọi model<br/>'chưa tìm thấy trong bài giảng,<br/>hỏi giảng viên/TA'"]
+    J -- "≥1 đoạn" --> L["Ghép prompt<br/>đoạn bài giảng + đề + lựa chọn<br/>+ key + đáp án HV + lịch sử<br/>+ tin nhắn (là DỮ LIỆU)"]
+
+    L --> M[["LLM thật<br/>gpt-4.1-mini · JSON schema<br/>intent · answer · outside_note<br/>key_concern · severity"]]
+    M --> N{intent?}
+    N -- off_topic --> O["Từ chối lịch sự<br/>không trích dẫn, không lộ prompt"]
+    N -- "correct / wrong / extend" --> P["Guard trích dẫn<br/>gỡ mọi mã [Txx-NNN]<br/>không nằm trong 8 đoạn đã lấy"]
+
+    P --> Q["Trả kết quả<br/>answer + citations + grounded<br/>+ outside_note (khung cảnh báo)"]
+    K --> R
+    O --> R
+    Q --> R[(Trace log<br/>logs/trace.jsonl<br/>mỗi lượt 1 dòng)]
+    R --> S["Giao diện hiện câu trả lời<br/>bấm mã đoạn → cột trái<br/>cuộn tới transcript"]
+    S --> F
+
+    classDef ai fill:#fff3cd,stroke:#d39e00,color:#000
+    classDef guard fill:#e2f0d9,stroke:#3c8c3c,color:#000
+    classDef rule fill:#f8d7da,stroke:#c00,color:#000
+    class M ai
+    class H,P guard
+    class K,O rule
+```
+
+*Màu:* 🟨 lời gọi AI thật (quyết định trung tâm) · 🟩 guard do code kiểm · 🟥 nhánh không gọi model / từ chối.
+
+**Luồng dữ liệu — từ data pack BTC đến prototype và eval**
+
+```mermaid
+flowchart LR
+    subgraph DATA["data/ (BTC, không commit)"]
+        T[6 transcript<br/>có mã đoạn]
+        CL[chatlog<br/>tutor_turns.csv]
+    end
+    subgraph BUILD["scripts/build_data.py"]
+        QB[question_bank.json<br/>turn_id · key · anchors · reviewed]
+    end
+    subgraph LOCAL["local-data/ (không commit)"]
+        SEG[segments.json<br/>700 đoạn Txx-NNN]
+        QS[questions.json<br/>9 câu: đề + lựa chọn thật]
+    end
+    T --> BUILD --> SEG
+    CL --> BUILD
+    QB --> BUILD --> QS
+
+    SEG --> SRV[server/app.py<br/>retrieval · prompts · llm]
+    QS --> SRV
+    SRV <--> UI[app/index.html]
+    SRV --> TR[(logs/trace.jsonl)]
+
+    subgraph EVAL["eval/"]
+        GS[golden-set.csv<br/>20 case · 4 lớp chỗ khó]
+        RE[run_eval.py<br/>gọi thẳng app.tutor]
+        RUN[runs/run-NN.md<br/>bảng đủ 20 case + %]
+        HU[runs/run-03-human.md<br/>chấm tay Q1]
+    end
+    GS --> RE --> SRV
+    RE --> RUN --> HU
+    HU -. sửa prompt / guard / nhãn .-> SRV
+    HU -. changelog .-> SPEC[spec.md §7 §9]
+```
+
+**Trình tự một lượt gọi — ai nói gì với ai**
+
+```mermaid
+sequenceDiagram
+    actor HV as Học viên
+    participant UI as app/index.html
+    participant API as server/app.py
+    participant IDX as retrieval.py (BM25)
+    participant LLM as OpenAI gpt-4.1-mini
+    participant LOG as logs/trace.jsonl
+
+    HV->>UI: chọn C ở câu 2 → Nộp
+    UI->>API: POST /api/submit {q02, C}
+    API-->>UI: correct=false, key=D, reviewed=true
+    HV->>UI: bấm "đáp án sai ở đâu"
+    UI->>API: POST /api/tutor {q02, C, message, intent_hint}
+    API->>API: guard đầu vào
+    API->>IDX: search(đề + lựa chọn + tin nhắn, transcript D01)
+    IDX-->>API: 8 đoạn [T04-072, T04-071, …]
+    alt 0 đoạn
+        API-->>UI: rule no_evidence (không gọi model)
+    else có đoạn
+        API->>LLM: system + user prompt (JSON schema)
+        LLM-->>API: {intent: wrong_answer, answer "[T04-072]…", outside_note…}
+        API->>API: gỡ mã trích dẫn không có trong 8 đoạn
+        API-->>UI: answer + citations + grounded + outside_note
+    end
+    API->>LOG: 1 dòng trace (input, output, cited, invalid, latency)
+    UI-->>HV: giải thích; bấm [T04-072] → mở đoạn transcript
+```
+
+
 ```
 data/vlearn-pack/ ──► scripts/build_data.py ──► local-data/segments.json   (700 đoạn [Txx-NNN])
 question_bank.json ─┘                       └─► local-data/questions.json  (9 câu quiz thật)
