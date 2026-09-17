@@ -17,6 +17,7 @@ import os
 import re
 import sys
 
+sys.stdout.reconfigure(encoding="utf-8")
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PACK = os.path.join(ROOT, "data", "vlearn-pack")
 CODEBASE = os.path.join(ROOT, "codebase")
