@@ -32,13 +32,15 @@ def load_env(path):
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
                 env[k.strip()] = v.strip().strip('"').strip("'")
-    keys = ("GEMINI_API_KEY", "GEMINI_MODEL", "PORT", "TOP_K")
+    keys = ("GEMINI_API_KEY", "GEMINI_MODEL", "OPENAI_API_KEY", "OPENAI_MODEL", "PORT", "TOP_K")
     return {**{k: os.environ[k] for k in keys if k in os.environ}, **env}  # .env ưu tiên hơn biến môi trường
 
 
 ENV = load_env(os.path.join(CODEBASE, ".env"))
-API_KEY = ENV.get("GEMINI_API_KEY", "")
-MODEL = ENV.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
+# Có OPENAI_API_KEY thì dùng OpenAI, không thì Gemini.
+PROVIDER = "openai" if ENV.get("OPENAI_API_KEY") else "gemini"
+API_KEY = ENV.get("OPENAI_API_KEY") or ENV.get("GEMINI_API_KEY", "")
+MODEL = ENV.get("OPENAI_MODEL", "gpt-4.1-mini") if PROVIDER == "openai" else ENV.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
 PORT = int(ENV.get("PORT", "8000"))
 TOP_K = int(ENV.get("TOP_K", "8"))
 
@@ -71,7 +73,7 @@ def tutor(payload):
     if not q or chosen not in q["options"] or not message:
         return 400, {"error": "Thiếu câu hỏi, đáp án đã chọn hoặc tin nhắn."}
     if not API_KEY:
-        return 500, {"error": "Chưa có GEMINI_API_KEY trong codebase/.env."}
+        return 500, {"error": "Chưa có OPENAI_API_KEY hoặc GEMINI_API_KEY trong codebase/.env."}
 
     transcripts = BANK["lecture_transcripts"].get(q["lecture"])
     query = " ".join([q["stem"], *q["options"].values(), q["options"][chosen], message])
@@ -81,7 +83,7 @@ def tutor(payload):
     user = build_user_prompt(q, chosen, segs, message, payload.get("intent_hint"), payload.get("history") or [])
     t0 = time.time()
     try:
-        out, usage = generate_json(API_KEY, MODEL, SYSTEM, user, RESPONSE_SCHEMA)
+        out, usage = generate_json(API_KEY, MODEL, SYSTEM, user, RESPONSE_SCHEMA, provider=PROVIDER)
     except LLMError as e:
         trace({"at": datetime.now().isoformat(timespec="seconds"), "qid": q["id"], "chosen": chosen,
                "message": message, "error": str(e)})
@@ -141,7 +143,7 @@ class Handler(BaseHTTPRequestHandler):
             with open(os.path.join(CODEBASE, "app", "index.html"), "rb") as f:
                 return self._send(200, f.read(), "text/html; charset=utf-8")
         if path == "/api/health":
-            return self._send(200, {"model": MODEL, "has_key": bool(API_KEY), "segments": len(SEGMENTS),
+            return self._send(200, {"provider": PROVIDER, "model": MODEL, "has_key": bool(API_KEY), "segments": len(SEGMENTS),
                                     "questions": len(QUESTIONS), "top_k": TOP_K})
         if path == "/api/questions":
             return self._send(200, [public_question(q) for q in QUESTIONS.values()])
@@ -165,7 +167,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print(f"VLearn AI Tutor · model={MODEL} · key={'OK' if API_KEY else 'THIẾU — điền vào codebase/.env'}")
+    print(f"VLearn AI Tutor · {PROVIDER} · model={MODEL} · key={'OK' if API_KEY else 'THIẾU — điền vào codebase/.env'}")
     print(f"{len(SEGMENTS)} đoạn transcript · {len(QUESTIONS)} câu hỏi · top_k={TOP_K}")
     print(f"Mở http://localhost:{PORT}")
     ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()

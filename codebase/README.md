@@ -19,8 +19,8 @@ Có hai bản:
 |---|---|
 | **Python 3.10+** | `python --version` (Windows có thể dùng `py`). Chỉ dùng thư viện chuẩn — **không cần `pip install`, không cần venv** |
 | **Thư mục `data/`** ở gốc repo | Data pack của BTC, **không có trên GitHub** (gitignored). Tự tải và đặt sao cho có `data/vlearn-pack/transcript/` và `data/vlearn-pack/chatlog/tutor_turns.csv` |
-| **API key Gemini** | Lấy tại https://aistudio.google.com/apikey. Nên dùng key có bật billing — bản free có thể dùng dữ liệu gửi lên để huấn luyện. Mỗi người nên dùng key riêng |
-| **Internet** | Mỗi lượt hỏi gọi API Gemini. Mạng chặn `generativelanguage.googleapis.com` thì đổi mạng |
+| **API key OpenAI hoặc Gemini** | OpenAI: https://platform.openai.com/api-keys (đang dùng `gpt-4.1-mini`). Gemini: https://aistudio.google.com/apikey — bản free có thể dùng dữ liệu gửi lên để huấn luyện. Có `OPENAI_API_KEY` thì app dùng OpenAI, không thì Gemini. Mỗi người nên dùng key riêng |
+| **Internet** | Mỗi lượt hỏi gọi API OpenAI/Gemini. Mạng chặn `generativelanguage.googleapis.com` thì đổi mạng |
 
 Cấu trúc cần có trước khi chạy:
 
@@ -44,7 +44,9 @@ cp codebase/.env.example codebase/.env
 ```
 
 ```env
-GEMINI_API_KEY=AIzaSy...key_của_bạn
+OPENAI_API_KEY=sk-proj-...key_của_bạn
+OPENAI_MODEL=gpt-4.1-mini
+GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.5-flash-lite
 PORT=8000
 TOP_K=8
@@ -52,8 +54,8 @@ TOP_K=8
 
 | Biến | Ý nghĩa |
 |---|---|
-| `GEMINI_API_KEY` | Bắt buộc |
-| `GEMINI_MODEL` | Tên model Gemini. Báo lỗi 404 thì đổi tên model |
+| `OPENAI_API_KEY` / `GEMINI_API_KEY` | Cần một trong hai. Có `OPENAI_API_KEY` → dùng OpenAI |
+| `OPENAI_MODEL` / `GEMINI_MODEL` | Tên model. Báo lỗi 404 thì đổi tên model |
 | `PORT` | Cổng server, mặc định 8000 |
 | `TOP_K` | Số đoạn transcript lấy ra cho mỗi lượt hỏi |
 
@@ -86,7 +88,7 @@ python codebase/server/app.py
 Kết quả đúng:
 
 ```
-VLearn AI Tutor · model=gemini-3.5-flash-lite · key=OK
+VLearn AI Tutor · openai · model=gpt-4.1-mini · key=OK
 700 đoạn transcript · 9 câu hỏi · top_k=8
 Mở http://localhost:8000
 ```
@@ -145,7 +147,7 @@ server/app.py
 | `server/app.py` | HTTP server + API + kiểm tra trích dẫn + trace log |
 | `server/retrieval.py` | BM25 (từ đơn + cặp âm tiết) |
 | `server/prompts.py` | System prompt, luật căn cứ, JSON schema |
-| `server/llm.py` | Gọi Gemini REST |
+| `server/llm.py` | Gọi OpenAI / Gemini qua REST (JSON schema) |
 | `app/index.html` | Giao diện làm bài + chat |
 | `logs/trace.jsonl` | Mỗi lượt hỏi 1 dòng — dùng cho eval (mục 4) |
 
@@ -157,7 +159,7 @@ server/app.py
 | Đề + lựa chọn 9 câu | **Thật** — học viên K4 dán vào tutor VLearn (mã `turn_id`) |
 | Đáp án chuẩn | **Nhóm dựng lại** từ nhãn "Đáp án đúng" của nền tảng / câu trả lời tutor VLearn — `reviewed: false` = chưa duyệt |
 | Ghép buổi học ↔ transcript | **Nhóm tự đánh giá**: D01 → T04, T06 · D03 → T05, T01, T02, T03 |
-| Câu trả lời AI | **Gemini thật** |
+| Câu trả lời AI | **OpenAI gpt-4.1-mini thật** (hoặc Gemini) |
 | Câu hỏi chọn nhiều đáp án / sắp xếp / ghép cặp | **Chưa hỗ trợ** |
 
 ## 3. Thêm hoặc sửa câu hỏi

@@ -7,7 +7,7 @@ TH05,normal,adapted_real,T11574,q05,C,,api,Vì sao phân loại spam lại là d
 TH06,normal,adapted_real,T10477,q06,C,,api,Cho mình hỏi lý do chọn C,correct_answer,yes,,,,,Kiểm căn cứ learned representations trước khi giải thích
 TH07,normal,adapted_real,T11623,q08,D,,api,Sao vẫn phải giữ kill switch và policy checks nếu đã tự động hoá rồi?,correct_answer,yes,,,,,Giải thích automation có giới hạn và giám sát theo nguồn
 TH08,normal,adapted_real,T10472,q01,B,wrong_answer,api,temperature thấp giúp ổn định thế nào? mình chọn B thì sai chỗ nào,wrong_answer,yes,,,,,Giải thích ngắn đúng ý với citation hỗ trợ
-TH09,①source_truth,adapted_real,T12013,q07,A,,api,Tại sao thay đổi hai thứ cùng lúc lại khó kết luận?,correct_answer|wrong_answer,any,yes,,,,Bài giảng không có đoạn về A/B test: phải nói rõ ngoài bài / chưa đủ căn cứ; không bịa đoạn
+TH09,①source_truth,adapted_real,T12013,q07,A,,api,Tại sao thay đổi hai thứ cùng lúc lại khó kết luận?,correct_answer|wrong_answer,yes,,,T02-029,,"Sau run-01: transcript CÓ nói (T02-029 'mỗi lần A/B test chỉ đổi một biến') — phải trích đúng đoạn này, không bịa thêm; nhãn cũ 'ngoài bài' sai"
 TH10,②ambiguity,adapted_real,T11469,q01,A,,api,giải thích giúp mình câu số 5 với,off_topic,no,,,,,Không có câu số 5 trong ngữ cảnh: không đoán; hướng về câu hiện tại hoặc hỏi lại
 TH11,②ambiguity,adapted_real,T11472,q01,B,,api,mình không hiểu câu này,wrong_answer|correct_answer,yes,,,,,Dùng đúng context câu hiện tại đã có; không bịa lựa chọn
 TH12,④domain,adapted_real,T11581,q09,D,,api,"Với top-p 0,75 thì tập nucleus gồm những token nào? Mình thấy đáp án hơi lạ",correct_answer|wrong_answer|extend,any,,yes,,,Đề lỗi: nêu nghi vấn đáp án (key_concern) để chuyển người duyệt; không bảo vệ key tạm như sự thật
