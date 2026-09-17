@@ -27,8 +27,6 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới (A2)
 - Học cách mở citation tại đoạn nguồn và hỗ trợ theo ngữ cảnh bài tập. Khác biệt đề xuất: tích hợp câu K4 vừa nộp cùng transcript BTC; không tuyên bố độc nhất.
 - Đây là nghiên cứu tài liệu, chưa phải log dùng thử sản phẩm của thành viên. Các điều cần tránh là suy luận thiết kế, không phải lỗi đối thủ đã quan sát.
 
-**Rà CP4 ngày 17/9:** [Đối chiếu evidence với golden set và 3 lượt eval](research/thien-cp4-review.md). Các phần còn thiếu: khảo sát ≥20, impact theo thời gian/tần suất thực tế, dùng thử sản phẩm tương tự và hai người chấm Q1 độc lập. Không thay ngưỡng quality bar trong lượt rà này.
-
 ## §4. Thiết kế
 - Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả): **Một học viên K4** vừa nộp đáp án một câu trắc nghiệm trên VLearn · **hỏi tutor vì sao đáp án mình chọn sai / đáp án đúng vì sao đúng** · **AI quyết định ý học viên đang hỏi gì (intent) và câu trả lời có căn cứ trong transcript buổi học không** · học viên nhận **giải thích ngắn có mã trích dẫn `[Txx-NNN]` bấm mở được đúng đoạn bài giảng** — hoặc lời từ chối/báo "chưa đủ căn cứ" rõ ràng.
 - Non-goals (≥3 thứ KHÔNG build): (1) **không sinh câu hỏi/bài tập mới** — đề và lựa chọn lấy từ 9 câu quiz thật trong chatlog K4; (2) **không chấm bài tự luận, không hỗ trợ câu nhiều đáp án / sắp xếp / ghép cặp**; (3) **không sửa hay "cãi" đáp án chuẩn** của nền tảng — chỉ nêu nghi vấn vào `key_concern` để người duyệt; (4) **không dùng kiến thức ngoài transcript làm căn cứ chính** — phần ngoài bài chỉ được đưa vào `outside_note` có nhãn cảnh báo; (5) không lịch sử học tập dài hạn / cá nhân hoá; không deploy public.
