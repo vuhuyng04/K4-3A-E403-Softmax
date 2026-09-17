@@ -215,23 +215,23 @@ sequenceDiagram
     participant LOG as logs/trace.jsonl
 
     HV->>UI: chọn C ở câu 2 → Nộp
-    UI->>API: POST /api/submit {q02, C}
+    UI->>API: POST /api/submit (q02, C)
     API-->>UI: correct=false, key=D, reviewed=true
-    HV->>UI: bấm "đáp án sai ở đâu"
-    UI->>API: POST /api/tutor {q02, C, message, intent_hint}
+    HV->>UI: bấm nút đáp án sai ở đâu
+    UI->>API: POST /api/tutor (q02, C, message, intent_hint)
     API->>API: guard đầu vào
     API->>IDX: search(đề + lựa chọn + tin nhắn, transcript D01)
-    IDX-->>API: 8 đoạn [T04-072, T04-071, …]
+    IDX-->>API: 8 đoạn (T04-072, T04-071, …)
     alt 0 đoạn
-        API-->>UI: rule no_evidence (không gọi model)
+        API-->>UI: rule no_evidence — không gọi model
     else có đoạn
         API->>LLM: system + user prompt (JSON schema)
-        LLM-->>API: {intent: wrong_answer, answer "[T04-072]…", outside_note…}
+        LLM-->>API: intent=wrong_answer, answer có mã T04-072, outside_note
         API->>API: gỡ mã trích dẫn không có trong 8 đoạn
         API-->>UI: answer + citations + grounded + outside_note
     end
     API->>LOG: 1 dòng trace (input, output, cited, invalid, latency)
-    UI-->>HV: giải thích; bấm [T04-072] → mở đoạn transcript
+    UI-->>HV: giải thích — bấm mã T04-072 → mở đoạn transcript
 ```
 
 
@@ -246,7 +246,8 @@ Trình duyệt (app/index.html)
 server/app.py
   1. retrieval.py  — BM25 lấy TOP_K đoạn transcript của đúng buổi học
   2. prompts.py    — ghép: đoạn bài giảng + câu hỏi + lựa chọn + đáp án chuẩn + đáp án HV chọn + tin nhắn
-  3. llm.py        — gọi Gemini, trả JSON {intent, answer, outside_note, key_concern, severity}
+  3. llm.py        — gọi OpenAI (hoặc Gemini), trả JSON {intent, answer, outside_note, key_concern, severity}
+  0. Retrieval rỗng → không gọi model, trả lời cố định "chưa tìm thấy trong bài giảng" (rule no_evidence)
   4. Gỡ mọi trích dẫn không nằm trong các đoạn đã lấy (chống bịa nguồn)
   5. Ghi logs/trace.jsonl
 ```
