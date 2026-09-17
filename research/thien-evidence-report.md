@@ -1,6 +1,6 @@
-# Evidence & Research — Thiên · 16/09/2026
+# Evidence & Research — Thiên · cập nhật CP4 ngày 17/09/2026
 
-Phạm vi đã được Thiên xác nhận: **giải thích câu trắc nghiệm sau khi học viên nộp đáp án**. CP1 và CP2 đã hoàn thành theo thông tin của Thiên; CP3 chưa hoàn thành. Báo cáo này không xác nhận prototype đã chạy thành công hoặc có hiệu quả học tập.
+Phạm vi đã được Thiên xác nhận: **giải thích câu trắc nghiệm sau khi học viên nộp đáp án**. CP1–CP3 đã hoàn thành theo thông tin của Thiên. Đã đối chiếu golden set và ba lượt eval lưu trong repo cho CP4; kết quả kiểm tự động không chứng minh hiệu quả học tập. Xem [bản rà CP4](thien-cp4-review.md).
 
 ## 1. Phương pháp mining có thể kiểm lại
 
@@ -8,7 +8,7 @@ Chạy tại gốc repo: `python -X utf8 research/analyze_evidence.py`.
 
 Script đọc CSV bằng thư viện chuẩn, lọc `cohort_hint=K4`, tách `is_preset=False`, rồi áp regex không phân biệt hoa/thường trên toàn `student_question`, bao gồm tiền tố ngữ cảnh. Các regex, SHA-256 file nguồn và danh sách mã lượt khớp nằm trong `mining-summary.json`. Không xuất toàn văn hội thoại. Một dòng là một lượt hỏi–đáp, không phải một người hoặc một phiên học. Số người là số mã `student` duy nhất trong từng tập.
 
-Đọc khám phá ban đầu: 40 lượt trong `../thien-step2-reading-notes.md`. Bước tiếp theo đọc các ứng viên có ngữ cảnh quiz và yêu cầu giải thích để phát hiện nhầm từ khóa. Đây là phân loại do trợ lý AI hỗ trợ; chưa được Thiên duyệt độc lập.
+Đọc khám phá ban đầu: 40 lượt theo phương pháp chọn đều 30 lượt không có cờ preset và 10 lượt có cờ preset (chỉ số trong mỗi nhóm: floor(i*(N-1)/(m-1)), i từ 0 đến m-1). Sau đó đọc các ứng viên có ngữ cảnh quiz và yêu cầu giải thích để phát hiện nhầm từ khóa. Đây là phân loại do trợ lý AI hỗ trợ; chưa được Thiên duyệt độc lập. Notes đọc khám phá được giữ local, không phải phụ thuộc của báo cáo công khai này.
 
 | Tập dữ liệu | Số lượng |
 |---|---:|
@@ -81,5 +81,6 @@ Không nhân các proxy thành điểm impact giả. Bảng chưa đủ dữ li�
 
 - §1–§3 đã được đưa vào `../spec.md`; Huy phụ trách hoàn thiện các phần thiết kế, quality bar và chốt spec.
 - `../eval/thien-case-seeds.csv`: 20 case thiết kế, gồm 12 case từ 12 mã chatlog khác nhau và 8 biến thể tự soạn; đây là seed có hành vi mong đợi, chưa phải golden set đã duyệt/chạy.
-- Rủi ro phải kiểm CP3: cả 9 câu trong question_bank hiện `reviewed=false`; đáp án do tutor trả không tự động là ground truth. q07 thiếu căn cứ; q09 có nghi vấn đề/đáp án. Người duyệt cần kiểm transcript và có hành vi hiển thị phù hợp khi không đủ căn cứ.
-- Không dùng kết quả mining thay % pass eval; chưa có lượt chạy AI trong phần việc này.
+- Golden set chính hiện là [eval/golden-set.csv](../eval/golden-set.csv), có 20 case và 12 mã nguồn K4 đã đối chiếu; seed là bản thiết kế ban đầu, không ghi đè nhãn đã sửa ở golden set.
+- Question bank hiện có 7/9 câu gắn reviewed=true bởi trợ lý AI, vẫn cần Phong xác nhận; q06 và q09 chưa duyệt. q07 đã tìm được căn cứ T02-029, không còn là ví dụ thiếu nguồn. q09 giữ nghi vấn đề/đáp án.
+- Ba lượt lưu có kết quả tự động 16/20, 19/20, 20/20. Q1 hiện mới có bản AI chấm hỗ trợ; chưa xác nhận đạt toàn bộ quality bar. Không dùng kết quả mining thay % pass eval hoặc xem 100% tự động là bằng chứng cải thiện học tập.
