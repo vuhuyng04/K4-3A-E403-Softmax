@@ -22,6 +22,8 @@ from prompts import RESPONSE_SCHEMA, SYSTEM, build_user_prompt  # noqa: E402
 from retrieval import Index  # noqa: E402
 
 CITE_RE = re.compile(r"\[(T\d{2}-\d{3})\]")
+NO_EVIDENCE_ANSWER = ("Mình **chưa tìm thấy đoạn nào trong bài giảng** liên quan tới câu này nên không giải thích để tránh nói sai. "
+                      "Bạn thử hỏi cụ thể hơn về một đáp án, hoặc hỏi giảng viên/TA để được xác nhận nhé.")
 
 
 def load_env(path):
@@ -79,6 +81,17 @@ def tutor(payload):
     query = " ".join([q["stem"], *q["options"].values(), q["options"][chosen], message])
     segs = INDEX.search(query, transcripts, k=TOP_K)
     allowed = {s["id"] for s in segs}
+    if not segs:
+        # Conditional automation (HAX G10): không có căn cứ trong bài giảng thì KHÔNG gọi model, không đoán.
+        result = {"intent": "correct_answer", "answer": NO_EVIDENCE_ANSWER, "outside_note": "", "key_concern": "",
+                  "severity": [], "citations": [], "invalid_citations": [], "grounded": False, "anchor_hit": False,
+                  "retrieved": [], "latency_ms": 0, "model": "rule:no_evidence", "tokens": {"in": 0, "out": 0}}
+        trace({"at": datetime.now().isoformat(timespec="seconds"), "qid": q["id"], "turn_id": q["turn_id"],
+               "chosen": chosen, "key": q["key"], "intent_hint": payload.get("intent_hint"), "message": message,
+               "intent": "correct_answer", "answer": NO_EVIDENCE_ANSWER, "outside_note": "", "key_concern": "",
+               "severity": [], "invalid_citations": [], "grounded": False, "anchor_hit": False, "latency_ms": 0,
+               "model": "rule:no_evidence", "tokens": {"in": 0, "out": 0}, "cited": [], "retrieved": []})
+        return 200, result
 
     user = build_user_prompt(q, chosen, segs, message, payload.get("intent_hint"), payload.get("history") or [])
     t0 = time.time()
