@@ -27,3 +27,7 @@ node_modules/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Khảo sát thô có tên/MSSV/Discord — chỉ giữ local, dùng bản research/survey-anonymized.csv
+Thông\ tin\ liên\ hệ.csv
+*lien-he*.csv
