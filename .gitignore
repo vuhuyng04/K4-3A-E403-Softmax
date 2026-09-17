@@ -35,3 +35,7 @@ Thông\ tin\ liên\ hệ.csv
 # Video quay tự động: giữ mp4, bỏ webm gốc và thư mục tạm
 eval/*.webm
 eval/_video_tmp/
+# Ghi chú cá nhân của Thiên — chỉ giữ local
+/research/thien-handoff.md
+/research/thien-reading-log.md
+/thien-step2-reading-notes.md
