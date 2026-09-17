@@ -31,3 +31,7 @@ Thumbs.db
 # Khảo sát thô có tên/MSSV/Discord — chỉ giữ local, dùng bản research/survey-anonymized.csv
 Thông\ tin\ liên\ hệ.csv
 *lien-he*.csv
+
+# Video quay tự động: giữ mp4, bỏ webm gốc và thư mục tạm
+eval/*.webm
+eval/_video_tmp/

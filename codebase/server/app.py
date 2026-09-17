@@ -103,7 +103,9 @@ def tutor(payload):
         return 502, {"error": str(e)}
     latency = int((time.time() - t0) * 1000)
 
-    answer = out.get("answer", "")
+    # Model đôi khi trả chuỗi backslash-n (escape hai lần trong JSON) thay vì xuống dòng thật → chuẩn hoá trước khi hiện
+    answer = (out.get("answer") or "").replace("\\n", "\n")
+    out["outside_note"] = (out.get("outside_note") or "").replace("\\n", "\n")
     cited = list(dict.fromkeys(CITE_RE.findall(answer)))
     invalid = [c for c in cited if c not in allowed]
     for c in invalid:

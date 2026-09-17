@@ -340,7 +340,7 @@ async function ask(text, intent){
   chat.push({role:"user", html:`<p>${esc(text)}</p>`, text});
   S.busy = true; renderChat(); renderQuestion();
   const typing = document.createElement("div");
-  typing.className = "msg ai typing"; typing.innerHTML = `<i></i><i></i><i></i><span>Đang tìm trong transcript và hỏi Gemini…</span>`;
+  typing.className = "msg ai typing"; typing.innerHTML = `<i></i><i></i><i></i><span>Đang tìm trong transcript và hỏi AI…</span>`;
   $("msgs").appendChild(typing); $("msgs").scrollTop = $("msgs").scrollHeight;
   try{
     const r = await api("/api/tutor", {qid:q.id, chosen:S.picked[q.id], message:text, intent_hint:intent || null, history});
@@ -359,7 +359,7 @@ async function ask(text, intent){
   try{
     const [health, qs] = await Promise.all([api("/api/health"), api("/api/questions")]);
     $("env").innerHTML = `<span class="badge">Dữ liệu thật · chạy local</span><span class="badge mono">${esc(health.model)}</span>`
-      + (health.has_key ? "" : `<span class="badge err">Thiếu GEMINI_API_KEY</span>`)
+      + (health.has_key ? "" : `<span class="badge err">Thiếu API key</span>`)
       + `<span class="badge mono">${health.segments} đoạn · top ${health.top_k}</span>`;
     S.qs = qs; renderQuestion({enter:true}); renderChat();
   }catch(err){
